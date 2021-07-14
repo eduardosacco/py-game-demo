@@ -1,4 +1,8 @@
 import pygame
+import functools
+
+def tupleAdd(x, y):
+    return (x[0] + y[0], x[1] + y[1])
 
 color_black = (0, 0, 0)
 color_white = (255, 255, 255)
@@ -7,6 +11,13 @@ screen_width = 800
 screen_height = 600
 player_width = 35
 player_height = 40
+
+move_map = {
+    pygame.K_UP: ( 0, -1),
+    pygame.K_DOWN: ( 0,  1),
+    pygame.K_LEFT: (-1,  0),
+    pygame.K_RIGHT: ( 1,  0)
+}
 
 pygame.init()
 screen = pygame.display.set_mode((screen_width, screen_height))
@@ -22,10 +33,8 @@ backGroundSprite = backGroundSprite.convert()
 
 frame =  pygame.time.Clock()
 
-x = screen_width / 2 - player_width / 2
-y = screen_height / 2 - player_height / 2
-dx = 0
-dy = 0
+pos = (screen_width / 2 - player_width / 2, screen_height / 2 - player_height / 2)
+delta = (0, 0)
 
 while finished == False:
     for event in pygame.event.get():
@@ -34,33 +43,15 @@ while finished == False:
 
         step = 30
         pressed = pygame.key.get_pressed()
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_UP:
-                dy = -step
-            elif event.key == pygame.K_LEFT:
-                dx = -step
-            elif event.key == pygame.K_RIGHT:
-                dx = step
-            elif event.key == pygame.K_DOWN:
-                dy = step
-        elif event.type == pygame.KEYUP:
-            if event.key == pygame.K_UP:
-                dy = 0
-            elif event.key == pygame.K_LEFT:
-                dx = 0
-            elif event.key == pygame.K_RIGHT:
-                dx = 0
-            elif event.key == pygame.K_DOWN:
-                dy = 0
+        move = [move_map[key] for key in move_map if pressed[key]]
+        direction = functools.reduce(tupleAdd, move, (0, 0))
 
-        x += dx
-        y += dy
+        print(direction * step)
+        if direction != (0, 0):
+            delta = tuple([step * x for x in direction])
+            pos = tupleAdd(pos, delta)
 
-        rect = pygame.Rect(x, y, 30, 30)
-        color = (0, 0, 255)
-        #screen.fill(color_white)
         screen.blit(backGroundSprite, (0,0))
-        screen.blit(playerSprite, (x, y))
-        #pygame.draw.rect(screen, color, rect)
+        screen.blit(playerSprite, pos)
         pygame.display.flip()
         frame.tick(30)
