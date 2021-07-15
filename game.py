@@ -147,19 +147,22 @@ while finished == False:
 
         treasureCollision = checkCollision(playerPos, playerSize, treasurePos, treasureSize)
         if treasureCollision:
-            screen.blit(textTreasure, textTreasurePos)
-            enemies.append(((initEnemyPos[0] - random.randint(10, 50), initEnemyPos[1] - level * 3 * enemySize[1]),
-                bool(random.getrandbits(1))))
             level += 1
-            enemyStep += 2 * level
-            textLevel = fontSmall.render("Level: " + str(level), True, color_white)
-            pygame.display.flip()
-            frame.tick(1)
-            playerPos = initPlayerPos
-
-            if level > 5:
+            if level <= 5:
+                screen.blit(textTreasure, textTreasurePos)
+                enemies.append(((initEnemyPos[0] - random.randint(10, 50), initEnemyPos[1] - (level - 1) * 3 * enemySize[1]),
+                    bool(random.getrandbits(1))))
+                
+                enemyStep += level
+                textLevel = fontSmall.render("Level: " + str(level), True, color_white)
+                pygame.display.flip()
+                frame.tick(1)
+                playerPos = initPlayerPos
+            else:
                 screen.blit(textWin, textWinPos)
-                pygame.time.wait(5)
+                pygame.display.flip()
+                pygame.event.pump()
+                pygame.time.wait(5000)
                 finished = True
 
         pygame.display.flip()
